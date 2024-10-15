@@ -7,12 +7,10 @@ import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { UserEntity } from "src/user/entities/user.entity";
 import { UserModule } from "src/user/user.module";
-
 @Module({
     imports: [TypeOrmModule.forFeature([UserEntity]), RoleModule, UserModule,
     JwtModule.register({
-        global: true,
-        signOptions: { expiresIn: '3s' },
+        global: true
       })],
     controllers:[AuthController],
     providers:[AuthService,JwtService,],

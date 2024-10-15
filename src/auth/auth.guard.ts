@@ -14,11 +14,9 @@ export class AuthGuard implements CanActivate {
 
         // 1. Get token from headers
         const token = request.headers.authorization?.split(' ')[1] ?? [];
-        console.log(token);
-        
         // 2. jwtVerify validate token
         if(!token){
-            throw new HttpException('Token khong ton tai', HttpStatus.UNAUTHORIZED)
+            throw new HttpException('Token không tồn tại', HttpStatus.UNAUTHORIZED)
         }
         try {
             const payload = await this.jwtService.verifyAsync(
@@ -37,7 +35,7 @@ export class AuthGuard implements CanActivate {
             // 4. Assign user into request
             request.currentUser = user;
         } catch (error) {
-            throw new UnauthorizedException('Invalid token or expired');
+            throw new UnauthorizedException('Token không hợp lệ hoặc hết hạn');
         }
         return true;
     }

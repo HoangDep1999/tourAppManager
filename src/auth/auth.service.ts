@@ -57,6 +57,7 @@ export class AuthService{
         };
         const accessToken = await this.jwtService.signAsync(payload,{
             secret:process.env.JWT_SECRET,
+            expiresIn: '30s',
         })
         const data = {
             message: 'Đăng nhập thành công',
