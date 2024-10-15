@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { TourService } from './tour.service';
 import { TourDto } from './dto/tour.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('tour')
 export class TourController {
@@ -11,6 +12,7 @@ export class TourController {
     return this.tourService.create(tourDto);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.tourService.findAll();
