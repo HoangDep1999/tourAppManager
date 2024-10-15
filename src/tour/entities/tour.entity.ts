@@ -14,7 +14,7 @@ export class TourEntity extends ModelEntity{
     @Column()
     endDate: Date;
 
-    @Column()
+    @Column({default: 0})
     numbersGuest: number;
 
     @Column()

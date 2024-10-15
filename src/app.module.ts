@@ -6,18 +6,23 @@ import { PostModule } from './post/post.module';
 import { UserEntity } from './user/entities/user.entity';
 import { TourEntity } from './tour/entities/tour.entity';
 import { PostEntity } from './post/entities/post.entity';
+import * as dotenv from 'dotenv';
+import { RoleEntity } from './role/entities/role.entity';
+import { AuthModule } from './auth/auth.module';
+dotenv.config();
+
 
 @Module({
   imports: [TypeOrmModule.forRoot({
     type: 'mysql',
-    host: 'localhost',
-    port: 3306,
-    username: 'root',
-    password: '',
-    database: 'tour-app-clone',
-    entities: [UserEntity, TourEntity, PostEntity],
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_DATABASE_NAME,
+    entities: [UserEntity, TourEntity, PostEntity, RoleEntity],
     synchronize: true,
-    }), UserModule, TourModule, PostModule,
+    }), UserModule, TourModule, PostModule, AuthModule
   ],
 })
 export class AppModule {}
