@@ -25,7 +25,6 @@ export class AuthGuard implements CanActivate {
                     secret: process.env.JWT_SECRET
                 }
             );
-            console.log(payload);
             // 3. Search user in DB by payload
             
             const user = await this.userService.findOne(payload.id)

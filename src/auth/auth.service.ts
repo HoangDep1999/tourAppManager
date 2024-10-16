@@ -6,6 +6,7 @@ import { HttpStatus, Roles } from "src/global/global.enum";
 import * as bcrypt from 'bcrypt';
 import { UserEntity } from "src/user/entities/user.entity";
 import { UserDto } from "src/user/dto/user.dto";
+import { LoginDto } from "src/user/dto/login.dto";
 
 @Injectable()
 export class AuthService{
@@ -41,9 +42,9 @@ export class AuthService{
         return saveUser
     }
 
-
-    async login(userDto: UserDto): Promise<UserEntity |{ message: string; accessToken: string }>{
-        const {email, password} = userDto;
+    
+    async login(loginDto: LoginDto): Promise<UserEntity |{ message: string; accessToken: string }>{
+        const {email, password} = loginDto;
         const user = await this.userRepository.findByString('email',email)
         if(!user){
             throw new HttpException('Email chưa được đăng ký' , HttpStatus.ERROR);
@@ -57,11 +58,17 @@ export class AuthService{
         };
         const accessToken = await this.jwtService.signAsync(payload,{
             secret:process.env.JWT_SECRET,
-            expiresIn: '30s',
+            expiresIn: '1d',
+        })
+
+        const refreshToken = await this.jwtService.signAsync(payload,{
+            secret:process.env.REFRESH_SECRET,
+            expiresIn: '7d',
         })
         const data = {
             message: 'Đăng nhập thành công',
-            accessToken
+            accessToken,
+            refreshToken
         };
         return data
         

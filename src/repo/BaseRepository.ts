@@ -18,7 +18,10 @@ export abstract class BaseRepository<T extends BaseEntity, R extends Repository<
     }
 
     async findById(id: number): Promise<T> {
-        return this.repository.findOne({ where: { id } as FindOptionsWhere<BaseEntity>});
+        return this.repository.findOne({ 
+            where: { id } as FindOptionsWhere<BaseEntity>,
+            relations: ['roles'],
+        });
     }
 
     async findByString(fieldName: string, value: string): Promise<T> {
@@ -26,8 +29,10 @@ export abstract class BaseRepository<T extends BaseEntity, R extends Repository<
             where: { [fieldName]: value } as FindOptionsWhere<BaseEntity>,
         });
     }
-    async update(data: Partial<T>, id: number): Promise<T> {
-        throw new Error("Method not implemented.");
+    async update(id: number, data: Partial<D>): Promise<T> {
+        const entity = await this.findById(id);
+        const newEntity = {...entity, ...data}
+        return this.repository.save(newEntity as any)
     }
    async delete(id: number): Promise<boolean> {
         throw new Error("Method not implemented.");

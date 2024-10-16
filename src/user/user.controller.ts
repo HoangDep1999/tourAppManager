@@ -1,21 +1,36 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, ClassSerializerInterceptor, Put, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
+import { CurrentUser } from './decorators/currentuser.decorator';
+import { UserEntity } from './entities/user.entity';
+import { RoleGuard } from 'src/role/role.guard';
 
 @Controller('user')
+@UseInterceptors(ClassSerializerInterceptor)
+@UseInterceptors(LoggingInterceptor)
+@UseGuards(AuthGuard)
 export class UserController {
   constructor(
     private readonly userService: UserService,
   ) {}
-
-  @Post()
-  create(@Body() userDto: UserDto) {
+  
+  @Post('/create-user')
+  async create(@Body(new ValidationPipe()) userDto: UserDto) : Promise<UserEntity>{
     return this.userService.create(userDto);
   }
 
+  @Get('/current-user')
+  @UseGuards(new RoleGuard(['admin']))
   @UseGuards(AuthGuard)
+  getCurrentUser(@CurrentUser() currentUser: UserEntity){
+    return currentUser;
+  }
+  
   @Get()
+  @UseGuards(new RoleGuard(['customer']))
+  @UseGuards(AuthGuard)
   findAll() {
     return this.userService.findAll();
   }
@@ -25,9 +40,10 @@ export class UserController {
     return this.userService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() userDto: UserDto) {
-    return this.userService.update(+id, userDto);
+  @Put(':id')
+  @UseGuards(AuthGuard)
+  async update(@Param('id') id: string, @Body() userDto: UserDto, @CurrentUser() currentUser: UserEntity): Promise<UserEntity>{
+    return this.userService.update(+id, userDto, currentUser);
   }
 
   @Delete(':id')
