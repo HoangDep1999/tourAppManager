@@ -42,8 +42,9 @@ export class UserController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() userDto: UserDto): Promise<UserEntity>{
-    return this.userService.update(+id, userDto);
+  @UseGuards(AuthGuard)
+  async update(@Param('id') id: string, @Body() userDto: UserDto, @CurrentUser() currentUser: UserEntity): Promise<UserEntity>{
+    return this.userService.update(+id, userDto, currentUser);
   }
 
   @Delete(':id')

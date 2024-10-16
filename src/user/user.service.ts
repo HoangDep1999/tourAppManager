@@ -4,6 +4,8 @@ import { UserRepository } from 'src/repo/user.repo';
 import { UserEntity } from './entities/user.entity';
 import { HttpStatus, Roles } from 'src/global/global.enum';
 import { RoleRepository } from 'src/repo/role.repo';
+import { CurrentUser } from './decorators/currentuser.decorator';
+import { CheckPermission } from 'src/helpers/checkPermission';
 
 
 @Injectable()
@@ -38,11 +40,13 @@ export class UserService {
       return await this.userRepository.findById(id)
   }
 
-  async update(id: number, userDto: Partial<UserDto>): Promise<UserEntity> {
+  async update(id: number, userDto: Partial<UserDto>, @CurrentUser() currentUser: UserEntity): Promise<UserEntity> {
     const userExist = await this.userRepository.findById(id);
     if(!userExist){
       throw new HttpException('Người dùng không tồn tại', HttpStatus.ERROR);
     }
+
+    CheckPermission.checkPermission(id, currentUser)
 
     if (userDto.email) {
       const emailExists = await this.userRepository.findByString('email', userDto.email);
