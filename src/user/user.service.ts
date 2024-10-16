@@ -62,7 +62,6 @@ export class UserService {
       }
     }
     const defaultRole = await this.roleRepository.findAll();
-    console.log(defaultRole);
     
     const roleExist = defaultRole.some(result => result.id === userDto.roles?.id)
     if(!roleExist) throw new HttpException('Role này không tồn tại', HttpStatus.ERROR);
