@@ -32,7 +32,6 @@ export class UserController {
   @UseGuards(new RoleGuard(['customer']))
   @UseGuards(AuthGuard)
   findAll() {
-    console.log('Second');
     return this.userService.findAll();
   }
 

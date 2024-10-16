@@ -22,8 +22,6 @@ export class TourRepository extends BaseRepository<TourEntity,Repository<TourEnt
             guide: tour.guide,
             post: tour.post
         }
-        console.log(data);
-        
         return 
     }
 }
