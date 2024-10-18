@@ -17,6 +17,8 @@ export class UserController {
   ) {}
   
   @Post('/create-user')
+  @UseGuards(new RoleGuard(['admin']))
+  @UseGuards(AuthGuard)
   async create(@Body(new ValidationPipe()) userDto: UserDto) : Promise<UserEntity>{
     return this.userService.create(userDto);
   }

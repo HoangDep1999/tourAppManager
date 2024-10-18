@@ -1,4 +1,4 @@
-import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { UserRepository } from 'src/repo/user.repo';
 import { UserEntity } from './entities/user.entity';
@@ -7,7 +7,8 @@ import { RoleRepository } from 'src/repo/role.repo';
 import { CurrentUser } from './decorators/currentuser.decorator';
 import { CheckPermission } from 'src/helpers/checkPermission';
 import { AllExceptionsFilter } from 'src/helpers/http-exception.filter';
-
+import * as bcrypt from 'bcrypt';
+import { RoleEntity } from 'src/role/entities/role.entity';
 
 @Injectable()
 export class UserService {
@@ -21,9 +22,16 @@ export class UserService {
   async create(userDto: UserDto): Promise<UserEntity>{
     await this.checkValidateParam(userDto.email, 'email', 'Email đã được sử dụng')
     await this.checkValidateParam(userDto.phone, 'phone', 'SĐT đã được sử dụng')
-    userDto.roles ? userDto.roles.id = Roles.CUSTOMER : null;
-
-    return await this.userRepository.create(userDto);
+    const hashedPassword = await bcrypt.hash(userDto.password, 10);
+    if(!userDto.roles){
+      userDto.roles = new RoleEntity();
+      userDto.roles.id = Roles.CUSTOMER;
+    }else{
+      userDto.roles.id = null;
+    }
+    const newUser = await this.userRepository.create({ ...userDto, password: hashedPassword });
+    newUser.roles.id = userDto.roles.id
+    return await this.userRepository.saveEntity(newUser)
   }
 
   async findAll(): Promise<UserEntity[]> {
