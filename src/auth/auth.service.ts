@@ -18,6 +18,9 @@ export class AuthService{
         private jwtService: JwtService
     ){}
     
+    hashData(data: string){
+        return bcrypt.hash(data, 10);
+    }
 
     async register(userDto: UserDto): Promise<UserEntity>{
         const customerRole = await this.roleRepository.findById(Roles.CUSTOMER)
@@ -33,7 +36,7 @@ export class AuthService{
         if (!userDto.password) {
             throw new HttpException('Mật khẩu không được để trống', HttpStatus.ERROR);
         }
-        const hashedPassword = await bcrypt.hash(userDto.password, 10);
+        const hashedPassword = await this.hashData(userDto.password);
          const newUser = this.userRepository.create({ ...userDto, password: hashedPassword });
         // const newUser = this.userRepository.create(userDto);
         (await newUser).roles = customerRole;
@@ -74,6 +77,10 @@ export class AuthService{
         
     }
 
+    // async updateRtHash(userId: number, refreshToken: string){
+    //     const hash = await this.hashData(refreshToken);
+    //     await this.userRepository.findById(up)
+    // }
 
     
 }

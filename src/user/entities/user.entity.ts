@@ -23,7 +23,7 @@ export class UserEntity extends ModelEntity{
     @Exclude()
     @Column()
     password: string
-
+    
     @Unique(["phone"])
     @Column()
     phone: string
